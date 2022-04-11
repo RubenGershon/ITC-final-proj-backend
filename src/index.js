@@ -1,6 +1,12 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import mongoose from "mongoose"
+
+
+mongoose.connect(
+  "mongodb+srv://ruben:1234@petadoption.e0jz5.mongodb.net/PetAdoption?retryWrites=true&w=majority"
+);
 
 const app = new express();
 
