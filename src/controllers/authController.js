@@ -1,5 +1,7 @@
 import userModel from "../models/userModel.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+const JWT_SECRET = "jnsdcjns16sd51c6sdcserv16ef5v16df5v16";
 
 async function signUp(req, res) {
   const {
@@ -7,11 +9,10 @@ async function signUp(req, res) {
     lastName,
     phoneNumber,
     email,
-    password: plainTextpassword,
+    password
   } = req.body;
 
   try {
-    const password = await bcrypt.hash(plainTextpassword, 10);
     const user = await userModel.create({
       firstName,
       lastName,
@@ -19,9 +20,14 @@ async function signUp(req, res) {
       email,
       password,
     });
+    const jwtToken = jwt.sign(
+      { id: user._id, firstName: user.firstName },
+      JWT_SECRET
+    );
     return res.status(201).send({
       status: "ok",
       user: user,
+      token: jwtToken,
     });
   } catch (error) {
     return res.status(400).json({
@@ -42,7 +48,11 @@ async function login(req, res) {
       // check user password with hashed password stored in the database
       const validPassword = await bcrypt.compare(body.password, user.password);
       if (validPassword) {
-        res.status(200).json({ message: "Valid password" });
+        const jwtToken = jwt.sign(
+          { id: user._id, firstName: user.firstName },
+          JWT_SECRET
+        );
+        res.status(200).json({ message: "Valid password", token: jwtToken });
       } else {
         res.status(400).json({ error: "Invalid Password" });
       }
