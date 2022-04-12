@@ -1,28 +1,10 @@
-import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
-const JWT_SECRET = "jnsdcjns16sd51c6sdcserv16ef5v16df5v16";
+import token from "../authentication/token.js";
 
 async function update(req, res) {
-  const token =
-    req.header("Authorization").split(" ")[1] ||
-    req.body.token ||
-    req.query.token ||
-    req.headers["x-access-token"];
-
-  if (!token) {
-    return res.status(403).send({
-      status: "error",
-      message: "A token is required for authentication",
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    return res.status(401).send({
-      status: "error",
-      message: "Invalid token",
-    });
+  const response = token.tokenValidation(req);
+  if (response != "success") {
+    return res.status(401).send(response);
   }
 
   let doc = "";

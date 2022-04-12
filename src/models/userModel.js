@@ -6,32 +6,37 @@ const UserSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: true,
-      min: 2,
-      max: 255,
+      maxlength: 50,
     },
     lastName: {
       type: String,
       required: true,
-      min: 2,
-      max: 255,
+      maxlength: 50,
     },
     phoneNumber: {
       type: String,
       required: true,
+      maxlength: 50,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      min: 2,
-      max: 255,
+      maxlength: 50,
     },
     password: {
       type: String,
       required: true,
     },
-    role: { type: String, default: "user" },
-    bio: { type: String, max: 300 },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    bio: {
+      type: String,
+      maxlength: 300,
+    },
   },
   { collection: "users" }
 );
