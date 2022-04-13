@@ -1,22 +1,38 @@
 import userModel from "../models/userModel.js";
+import userPetsModel from "../models/userPets.js";
 import token from "../authentication/token.js";
 import bcrypt from "bcrypt";
+
+function handleErrors(err) {
+  let errors = { email: "", password: "" };
+
+  if (err.code === 11000) {
+    errors.email = "email already in use";
+    return errors;
+  }
+  if (err.message.includes("user validation failed")) {
+    Object.values(err.errors).forEach(({ properties }) => {
+      errors[properties.path] = properties.message;
+    });
+  }
+  return errors;
+}
 
 async function signUp(req, res) {
   try {
     const user = await userModel.create(req.body);
+    await userPetsModel.create({ userId: user._id });
+    res.cookie("userId", user._id);
     const jwtToken = token.createToken(user._id, user.firstName);
 
-    return res.status(201).send({
+    res.status(201).json({
       status: "ok",
       user: user,
       token: jwtToken,
     });
   } catch (error) {
-    return res.status(400).json({
-      status: "error",
-      message: "email-already-in-use",
-    });
+    const errors = handleErrors(error);
+    res.status(400).json({ errors });
   }
 }
 
@@ -31,6 +47,7 @@ async function login(req, res) {
       // check user password with hashed password stored in the database
       const validPassword = await bcrypt.compare(body.password, user.password);
       if (validPassword) {
+        res.cookie("userId", user._id);
         const jwtToken = token.createToken(user._id, user.firstName);
         res.status(200).json({ message: "Valid password", token: jwtToken });
       } else {
@@ -47,4 +64,6 @@ async function login(req, res) {
   }
 }
 
-export default { signUp, login };
+async function logout(req, res) {}
+
+export default { signUp, login, logout };

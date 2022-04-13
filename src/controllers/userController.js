@@ -1,12 +1,6 @@
 import userModel from "../models/userModel.js";
-import token from "../authentication/token.js";
 
 async function update(req, res) {
-  const response = token.tokenValidation(req);
-  if (response != "success") {
-    return res.status(401).send(response);
-  }
-
   let doc = "";
   try {
     doc = await userModel.findOne({ _id: req.params.id });
