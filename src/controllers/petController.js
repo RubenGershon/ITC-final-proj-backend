@@ -17,40 +17,23 @@ async function add(req, res) {
 }
 
 async function getById(req, res) {
-  try {
-    const pet = await petModel.findById({ _id: req.params.id });
-    return res.status(201).send({
-      status: "ok",
-      pet: pet,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      status: "error",
-      message: "pet-not-found",
-    });
-  }
+  res.status(201).send({
+    status: "ok",
+    pet: res.locals.validatedPet,
+  });
 }
 
 async function update(req, res) {
-  let doc = "";
+  const pet = res.locals.validatedPet;
   try {
-    doc = await petModel.findOne({ _id: req.params.id });
-  } catch (err) {
-    return res.status(401).send({
-      status: "error",
-      message: "pet-not-found",
-    });
-  }
-
-  try {
-    doc.overwrite(req.body);
-    await doc.save();
+    pet.overwrite(req.body);
+    await pet.save();
     res.json({
       status: "ok",
       message: "pet successfully updated",
     });
   } catch (err) {
-    return res.status(401).send({
+    res.status(401).json({
       status: "error",
       message: err,
     });
@@ -90,9 +73,9 @@ async function adopt(req, res) {
       pet: "pet successfully " + req.body.adoptionStatus,
     });
   } catch (err) {
-    return res.status(401).send({
+    res.status(401).send({
       status: "error",
-      message: "pet-not-found",
+      message: err,
     });
   }
 }
@@ -115,7 +98,7 @@ async function returnPet(req, res) {
   } catch (err) {
     return res.status(401).send({
       status: "error",
-      message: "pet-not-found",
+      message: err,
     });
   }
 }
@@ -133,7 +116,7 @@ async function save(req, res) {
   } catch (err) {
     return res.status(401).send({
       status: "error",
-      message: "pet-not-found",
+      message: err,
     });
   }
 }
@@ -151,7 +134,7 @@ async function unsave(req, res) {
   } catch (err) {
     return res.status(401).send({
       status: "error",
-      message: "pet-not-found",
+      message: err,
     });
   }
 }

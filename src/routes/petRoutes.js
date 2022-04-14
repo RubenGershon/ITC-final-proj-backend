@@ -1,16 +1,23 @@
 import express from "express";
 import petController from "../controllers/petController.js";
 import tokenValidation from "../middlewares/tokenValidation.js";
+import petIdValidation from "../middlewares/petIdValidation.js";
 
 const router = express.Router();
+router.use(tokenValidation);
 
-router.post("/", tokenValidation, petController.add);
-router.get("/", tokenValidation, petController.getByQuery);
-router.get("/:id", tokenValidation, petController.getById);
-router.put("/:id", tokenValidation, petController.update);
-router.post("/:id/adopt", tokenValidation, petController.adopt);
-router.post("/:id/return", tokenValidation, petController.returnPet);
-router.post("/:id/save", tokenValidation, petController.save);
-router.delete("/:id/save", tokenValidation, petController.unsave);
+// add a new pet to DB
+router.post("/", petController.add);
+
+// Get pet(s) by query
+router.get("/", petController.getByQuery);
+
+// Get pet by ID
+router.get("/:id", petIdValidation, petController.getById);
+router.put("/:id", petIdValidation, petController.update);
+router.post("/:id/adopt", petIdValidation, petController.adopt);
+router.post("/:id/return", petIdValidation, petController.returnPet);
+router.post("/:id/save", petIdValidation, petController.save);
+router.delete("/:id/save", petIdValidation, petController.unsave);
 
 export default router;

@@ -1,31 +1,59 @@
 import userModel from "../models/userModel.js";
+import userPetsModel from "../models/userPets.js";
+import petModel from "../models/petModel.js";
 
-async function update(req, res) {
-  let doc = "";
+async function getAllUsers(req, res) {
   try {
-    doc = await userModel.findOne({ _id: req.params.id });
+    const users = await userModel.find({});
+    res.status(201).send({
+      status: "ok",
+      users: users,
+    });
   } catch (err) {
-    return res.status(401).send({
+    res.status(401).send({
       status: "error",
-      message: "user-not-found",
+      message: err,
     });
   }
+}
+
+async function getUserById(req, res) {
+  try {
+    const user = res.locals.validatedUser;
+    const userPets = await userPetsModel.findOne({ userId: req.params.id });
+    const caredPets = await petModel.find({
+      _id: { $in: userPets.caredPetsIds },
+    });
+    res.status(201).json({
+      status: "ok",
+      user: user,
+      userPets: caredPets,
+    });
+  } catch (err) {
+    res.status(401).json({
+      status: "error",
+      message: err,
+    });
+  }
+}
+
+async function update(req, res) {
+  const user = res.locals.validatedUser;
 
   // Use overwrite and save so we go by pre-save validation
   //  update(), updateMany(), findOneAndUpdate(), etc. do not execute save() middleware
   try {
-    doc.overwrite(req.body);
-    await doc.save();
+    user.overwrite(req.body);
+    await user.save();
     res.json({
       status: "ok",
       message: "user successfully updated",
     });
   } catch (err) {
-    return res.status(401).send({
+    res.status(401).json({
       status: "error",
       message: "email-already-in-use",
     });
   }
 }
-
-export default { update };
+export default { update, getAllUsers, getUserById };
