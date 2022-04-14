@@ -2,6 +2,13 @@ import userModel from "../models/userModel.js";
 import userPetsModel from "../models/userPets.js";
 import petModel from "../models/petModel.js";
 
+async function getUserById(req, res) {
+  res.status(201).send({
+    status: "ok",
+    user: res.locals.validatedUser,
+  });
+}
+
 async function getAllUsers(req, res) {
   try {
     const users = await userModel.find({});
@@ -17,7 +24,7 @@ async function getAllUsers(req, res) {
   }
 }
 
-async function getUserById(req, res) {
+async function getUserByIdFull(req, res) {
   try {
     const user = res.locals.validatedUser;
     const userPets = await userPetsModel.findOne({ userId: req.params.id });
@@ -56,4 +63,4 @@ async function update(req, res) {
     });
   }
 }
-export default { update, getAllUsers, getUserById };
+export default { update, getUserById, getAllUsers, getUserByIdFull };
