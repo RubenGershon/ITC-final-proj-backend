@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
@@ -6,19 +7,18 @@ import petRoutes from "./routes/petRoutes.js";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 
-mongoose.connect(
-  "mongodb+srv://ruben:1234@petadoption.e0jz5.mongodb.net/PetAdoption?retryWrites=true&w=majority"
-);
+mongoose.connect(process.env.MONGOOSE_CREDS);
 
 const app = new express();
 
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/pet", petRoutes);
 
-app.listen(8080, () => {
-  console.log(`Pet adoption app listening on port ${8080}...`);
+app.listen(process.env.PORT, () => {
+  console.log(`Pet adoption app listening on port ${process.env.PORT}...`);
 });
