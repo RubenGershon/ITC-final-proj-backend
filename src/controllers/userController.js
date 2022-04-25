@@ -1,6 +1,7 @@
 import userModel from "../models/userModel.js";
 import userPetsModel from "../models/userPets.js";
 import petModel from "../models/petModel.js";
+import deleteWrapper from "../utils.js";
 
 async function getUserById(req, res) {
   res.status(201).send({

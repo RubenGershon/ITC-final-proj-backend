@@ -2,12 +2,15 @@ import express from "express";
 import petController from "../controllers/petController.js";
 import tokenValidation from "../middlewares/tokenValidation.js";
 import petIdValidation from "../middlewares/petIdValidation.js";
+import multer from "multer";
+
+const upload = multer({ dest: process.env.UPLOAD_FOLDER + "/"})
 
 const router = express.Router();
 router.use(tokenValidation);
 
 // add a new pet to DB
-router.post("/", petController.add);
+router.post("/", upload.single("image"), petController.add);
 
 // Get pet(s) by query
 router.get("/", petController.getByQuery);

@@ -1,4 +1,4 @@
-function filterResponse(obj, toFilter) {
+function deleteWrapper(obj, toFilter) {
   toFilter.forEach((element) => {
     try {
       delete obj[element];
@@ -9,4 +9,4 @@ function filterResponse(obj, toFilter) {
   return obj;
 }
 
-export default filterResponse;
+export default deleteWrapper;

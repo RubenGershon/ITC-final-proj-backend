@@ -1,7 +1,7 @@
-import token from "../authentication/token.js";
+import tokenUtils from "../authentication/token.js";
 
 function tokenValidation(req, res, next) {
-  const response = token.tokenValidation(req);
+  const response = tokenUtils.tokenValidation(req);
   if (response.status === "ok") {
     req.user = response.authenticatedUser;
     next();
