@@ -18,7 +18,10 @@ router.put("/:id", adminValidation, petIdValidation, petController.update);
 // Get pet(s) by query
 router.get("/", petController.getByQuery);
 
-// Get pet by ID
+// Get multiple pets by list of IDs
+router.get("/byIDs", petController.getByIds);
+
+// Get specific pet by ID
 router.get("/:id", petIdValidation, petController.getById);
 router.post("/:id/adopt", userValidation, petIdValidation, petController.adopt);
 router.post(

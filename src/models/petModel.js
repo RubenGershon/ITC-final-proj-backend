@@ -28,7 +28,7 @@ const PetSchema = new mongoose.Schema(
       required: true,
       maxlength: 50,
     },
-    picture: {
+    imageUrl: {
       type: String,
       required: true,
       maxlength: 1000,
@@ -60,7 +60,6 @@ const PetSchema = new mongoose.Schema(
   },
   { collection: "pets" }
 );
-
 
 const petModel = mongoose.model("PetSchema", PetSchema);
 export default petModel;

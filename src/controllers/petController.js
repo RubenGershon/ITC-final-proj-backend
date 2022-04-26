@@ -1,4 +1,3 @@
-import petModel from "../models/petModel.js";
 import petQueries from "../queries/petQueries.js";
 
 async function add(req, res) {
@@ -18,6 +17,17 @@ async function getById(req, res) {
   });
 }
 
+async function getByIds(req, res) {
+  const response = await petQueries.findByQuery({ _id: {$in: JSON.parse(req.query.listOfPetsIds)}
+});
+  if (response.status === "ok") {
+    return res.status(201).send(response);
+  } else {
+    res.status(400).send(response);
+    return;
+  }
+}
+  
 async function update(req, res) {
   const response = await petQueries.updatePet(req);
   if (response.status === "ok") {
@@ -27,7 +37,7 @@ async function update(req, res) {
     return;
   }
 }
-
+  
 async function getByQuery(req, res) {
   const query = Object.keys(req.query).length !== 0 ? req.query : {};
 
@@ -97,6 +107,7 @@ async function unsave(req, res) {
 export default {
   add,
   getById,
+  getByIds,
   update,
   getByQuery,
   adopt,

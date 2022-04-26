@@ -31,15 +31,6 @@ async function findByQuery(query) {
   }
 }
 
-async function findAndUpdate(searchParam, updateParam) {
-  try {
-    const pets = await petModel.findOneAndUpdate(searchParam, updateParam);
-    return { status: "ok", data: pets };
-  } catch (error) {
-    return { status: "error", message: error };
-  }
-}
-
 async function updatePet(req) {
   const pet = req.pet;
   try {

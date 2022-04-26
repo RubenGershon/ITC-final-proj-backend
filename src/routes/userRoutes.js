@@ -14,6 +14,9 @@ router.get("/all", adminValidation, userController.getAllUsers);
 //Return all the user details (aside from password) and the users pets they own
 router.get("/", userValidation, userController.getUser);
 
+// Return all the pets saved/cared of the current user
+router.get("/pets", userValidation, userController.getUserPets);
+
 // Modify a user
 router.put("/", userValidation, userController.update);
 
