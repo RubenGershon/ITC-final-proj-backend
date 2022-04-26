@@ -1,3 +1,4 @@
+import uniqueArray from "mongoose-unique-array";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
@@ -37,6 +38,8 @@ const UserSchema = new mongoose.Schema(
       type: String,
       maxlength: 300,
     },
+    caredPetsIds: [String],
+    savedPetsIds: [String],
   },
   { collection: "users" }
 );
@@ -52,6 +55,8 @@ UserSchema.pre("save", async function (next) {
     return next(error);
   }
 });
+
+UserSchema.plugin(uniqueArray);
 const userModel = mongoose.model("UserSchema", UserSchema);
 
 export default userModel;

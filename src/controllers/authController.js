@@ -1,31 +1,32 @@
-import userModel from "../models/userModel.js";
-import userPetsModel from "../models/userPets.js";
+import authQueries from "../queries/authQueries.js";
 import tokenUtils from "../authentication/token.js";
 import bcrypt from "bcrypt";
 import deleteWrapper from "../utils.js";
 
 async function signUp(req, res) {
-  try {
-    const user = await userModel.create(req.body);
-    await userPetsModel.create({ userId: user._id });
-    const plainFilteredUser = deleteWrapper(user.toObject(), [
-      "password",
-      "__v",
-      "role",
-    ]);
-
-    res.cookie("token", tokenUtils.createToken(plainFilteredUser), {
-      httpOnly: true,
-    });
-
-    res.status(201).send({
-      status: "ok",
-      user: plainFilteredUser,
-    });
-    return
-  } catch (error) {
-    res.status(400).json({ status: "error", message: error });
+  const response = await authQueries.createUser(req.body);
+  if (response.status !== "ok") {
+    res.status(400).send(response);
+    return;
   }
+
+  const user = response.data;
+  const plainFilteredUser = deleteWrapper(user.toObject(), [
+    "password",
+    "phoneNumber",
+    "__v",
+  ]);
+
+  res.cookie("token", tokenUtils.createToken(plainFilteredUser), {
+    httpOnly: true,
+    sameSite: "lax",
+  });
+
+  res.status(201).send({
+    status: "ok",
+    data: plainFilteredUser,
+  });
+  return;
 }
 
 async function login(req, res) {
@@ -40,41 +41,40 @@ async function login(req, res) {
     return;
   }
 
-  try {
-    const user = await userModel.findOne({ email: body.email });
-    if (!user) {
-      res.status(400).json({ status: "error", message: "invalid email" });
-      return;
-    }
+  const response = await authQueries.findUser(body.email);
+  if (response.status !== "ok") {
+    res.status(404).send(response);
+    return;
+  }
 
-    if (await bcrypt.compare(body.password, user.password)) {
-      const plainFilteredUser = deleteWrapper(user.toObject(), [
-        "password",
-        "__v",
-        "role",
-      ]);
+  const user = response.data;
+  if (await bcrypt.compare(body.password, user.password)) {
+    const plainFilteredUser = deleteWrapper(user.toObject(), [
+      "password",
+      "phoneNumber",
+      "__v",
+    ]);
 
-      res.cookie("token", tokenUtils.createToken(plainFilteredUser), {
-        httpOnly: true,
-      });
-
-      res.status(201).json({
-        status: "ok",
-        user: plainFilteredUser,
-      });
-    } else {
-      res.status(400).json({ status: "error", message: "invalid password" });
-      return;
-    }
-  } catch (error) {
-    res.status(400).send({
-      status: "error",
-      message: error,
+    res.cookie("token", tokenUtils.createToken(plainFilteredUser), {
+      httpOnly: true,
+      sameSite: "lax",
     });
+
+    res.status(200).send({
+      status: "ok",
+      data: plainFilteredUser,
+    });
+  } else {
+    res.status(400).json({ status: "error", message: "invalid password" });
     return;
   }
 }
 
-async function logout(req, res) {}
+async function logout(req, res) {
+  res.clearCookie();
+  res.status(200).send({
+    status: "ok",
+  });
+}
 
 export default { signUp, login, logout };

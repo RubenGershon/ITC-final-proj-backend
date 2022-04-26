@@ -10,7 +10,7 @@ function tokenValidation(req) {
       req.cookies.token,
       process.env.JWT_SECRET
     );
-    return { status: "ok", authenticatedUser: authenticatedUser };
+    return { status: "ok", data: authenticatedUser };
   } catch (err) {
     return {
       status: "error",

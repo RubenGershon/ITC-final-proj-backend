@@ -1,142 +1,97 @@
 import petModel from "../models/petModel.js";
-import userPetsModel from "../models/userPets.js";
+import petQueries from "../queries/petQueries.js";
 
 async function add(req, res) {
-  try {
-    const pet = await petModel.create(req.body);
-    return res.status(201).send({
-      status: "ok",
-      pet: pet,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      status: "error",
-      message: error,
-    });
+  const response = await petQueries.createPet(req.body);
+  if (response.status === "ok") {
+    return res.status(201).send(response);
+  } else {
+    res.status(400).send(response);
+    return;
   }
 }
 
 async function getById(req, res) {
   res.status(201).send({
     status: "ok",
-    pet: res.locals.validatedPet,
+    data: req.pet,
   });
 }
 
 async function update(req, res) {
-  const pet = res.locals.validatedPet;
-  try {
-    pet.overwrite(req.body);
-    await pet.save();
-    res.json({
-      status: "ok",
-      message: "pet successfully updated",
-    });
-  } catch (err) {
-    res.status(401).json({
-      status: "error",
-      message: err,
-    });
+  const response = await petQueries.updatePet(req);
+  if (response.status === "ok") {
+    return res.status(201).send(response);
+  } else {
+    res.status(400).send(response);
+    return;
   }
 }
 
 async function getByQuery(req, res) {
-  const query = req.query;
-  if (Object.keys(query).length === 0) {
-    const allPets = await petModel.find({});
-    res.json({
-      status: "ok",
-      data: allPets,
-    });
-  }
+  const query = Object.keys(req.query).length !== 0 ? req.query : {};
 
-  const queryResult = await petModel.find(query);
-  res.json({
-    status: "ok",
-    data: queryResult,
-  });
+  const response = await petQueries.findByQuery(query);
+  if (response.status === "ok") {
+    return res.status(201).send(response);
+  } else {
+    res.status(400).send(response);
+    return;
+  }
 }
 
 async function adopt(req, res) {
   try {
-    // TODO Check for concurrency
-    const pet = await petModel.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { adoptionStatus: req.body.adoptionStatus } }
-    );
-    await userPetsModel.findOneAndUpdate(
-      { userId: req.cookies.userId },
-      { $set: { caredPetsIds: pet._id } }
-    );
-    res.status(201).send({
-      status: "ok",
-      pet: "pet successfully " + req.body.adoptionStatus,
-    });
+    req.user.caredPetsIds.push(req.pet._id);
+    await req.user.save();
   } catch (err) {
-    res.status(401).send({
-      status: "error",
-      message: err,
-    });
+    //do nothing if pet is already in caredPetsIds
   }
+
+  req.pet.adoptionStatus = req.body.adoptionStatus;
+  await req.pet.save();
+  res.status(201).send({
+    status: "ok",
+    message: "pet successfully " + req.body.adoptionStatus,
+  });
 }
 
 async function returnPet(req, res) {
-  try {
-    // TODO Check for concurrency
-    const pet = await petModel.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { adoptionStatus: "available" } }
-    );
-    await userPetsModel.findOneAndUpdate(
-      { userId: req.cookies.userId },
-      { $pull: { caredPetsIds: pet._id } }
-    );
-    res.status(201).send({
-      status: "ok",
-      pet: "pet successfully removed from care",
-    });
-  } catch (err) {
-    return res.status(401).send({
-      status: "error",
-      message: err,
-    });
-  }
+  req.user.caredPetsIds = req.user.caredPetsIds.filter(
+    (id) => id !== req.params.id
+  );
+  req.pet.adoptionStatus = "available";
+  await req.user.save();
+  await req.pet.save();
+  res.status(201).send({
+    status: "ok",
+    message: "pet successfully removed from care",
+  });
 }
 
 async function save(req, res) {
   try {
-    await userPetsModel.findOneAndUpdate(
-      { userId: req.cookies.userId },
-      { $set: { savedPetsIds: req.params.id } }
-    );
-    res.status(201).send({
-      status: "ok",
-      pet: "pet successfully saved",
-    });
+    req.user.savedPetsIds.push(req.pet._id);
+    await req.user.save();
   } catch (err) {
-    return res.status(401).send({
-      status: "error",
-      message: err,
-    });
+    //do nothing if pet is already in savedPetsIds
   }
+
+  res.status(201).send({
+    status: "ok",
+    message: "pet successfully saved",
+  });
 }
 
 async function unsave(req, res) {
-  try {
-    await userPetsModel.findOneAndUpdate(
-      { userId: req.cookies.userId },
-      { $pull: { savedPetsIds: req.params.id } }
-    );
-    res.status(201).send({
-      status: "ok",
-      pet: "pet successfully unsaved",
-    });
-  } catch (err) {
-    return res.status(401).send({
-      status: "error",
-      message: err,
-    });
-  }
+  req.user.savedPetsIds = req.user.savedPetsIds.filter(
+    (id) => id !== req.params.id
+  );
+  await req.user.save();
+  res.status(201).send({
+    status: "ok",
+    message: "pet successfully unsaved",
+  });
 }
 
 export default {
