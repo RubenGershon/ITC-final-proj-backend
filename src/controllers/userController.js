@@ -23,7 +23,6 @@ async function getAllUsers(req, res) {
   res.status(201).send(response);
 }
 
-
 //TODO
 async function update(req, res) {
   const user = req.user;
@@ -44,4 +43,5 @@ async function update(req, res) {
     });
   }
 }
-export default { update, getUser, getAllUsers, getUserPets };
+
+export default { update, getUser, getAllUsers };
