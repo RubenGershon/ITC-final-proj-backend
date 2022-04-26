@@ -9,7 +9,7 @@ async function createUser(data) {
       return { status: "error", message: "unknown" };
     }
   } catch (error) {
-    return { status: "error", message: error };
+    return { status: "error", message: "email already in use" };
   }
 }
 

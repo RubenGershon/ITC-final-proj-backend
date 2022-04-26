@@ -11,7 +11,7 @@ async function add(req, res) {
 }
 
 async function getById(req, res) {
-  res.status(201).send({
+  res.status(200).send({
     status: "ok",
     data: req.pet,
   });
@@ -21,7 +21,7 @@ async function getByIds(req, res) {
   const response = await petQueries.findByQuery({ _id: {$in: JSON.parse(req.query.listOfPetsIds)}
 });
   if (response.status === "ok") {
-    return res.status(201).send(response);
+    return res.status(200).send(response);
   } else {
     res.status(400).send(response);
     return;
@@ -43,7 +43,7 @@ async function getByQuery(req, res) {
 
   const response = await petQueries.findByQuery(query);
   if (response.status === "ok") {
-    return res.status(201).send(response);
+    return res.status(200).send(response);
   } else {
     res.status(400).send(response);
     return;

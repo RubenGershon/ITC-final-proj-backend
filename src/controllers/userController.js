@@ -1,5 +1,4 @@
 import userQueries from "../queries/userQueries.js";
-import petModel from "../models/petModel.js";
 import deleteWrapper from "../utils.js";
 
 async function getUser(req, res) {
@@ -24,7 +23,6 @@ async function getAllUsers(req, res) {
   res.status(201).send(response);
 }
 
-async function getUserPets(req, res) {}
 
 //TODO
 async function update(req, res) {
