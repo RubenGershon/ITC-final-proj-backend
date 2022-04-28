@@ -27,20 +27,21 @@ async function getAllUsers(req, res) {
 async function update(req, res) {
   const user = req.user;
 
-  // Use overwrite and save so we go by pre-save validation
-  //  update(), updateMany(), findOneAndUpdate(), etc. do not execute save() middleware
   try {
-    user.overwrite(req.body);
+    if ("email" in req.body) user.email = req.body.email;
+    if ("firstName" in req.body) user.firstName = req.body.firstName;
+    if ("lastName" in req.body) user.lastName = req.body.lastName;
+    if ("phoneNumber" in req.body) user.phoneNumber = req.body.phoneNumber;
+    if ("bio" in req.body) user.bio = req.body.bio;
+    if ("password" in req.body) user.password = req.body.password;
     await user.save();
     res.status(200).send({
       status: "ok",
       message: "user successfully updated",
     });
-  } catch (err) {
-    res.status(401).send({
-      status: "error",
-      message: "email-already-in-use",
-    });
+  } catch (error) {
+    res.status(400).send({ status: "error", message: "email already in use" });
+    return;
   }
 }
 

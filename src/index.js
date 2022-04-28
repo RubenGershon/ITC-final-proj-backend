@@ -19,6 +19,8 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/pet", petRoutes);
 
+app.get("/", (req, res) => res.send(req.body));
+
 app.listen(process.env.PORT, () => {
   console.log(`Pet adoption app listening on port ${process.env.PORT}...`);
 });
