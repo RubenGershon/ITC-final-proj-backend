@@ -1,7 +1,7 @@
 import petQueries from "../queries/petQueries.js";
 
 async function add(req, res) {
-  const response = await petQueries.createPet(req.body);
+  const response = await petQueries.createPet({ ...req.body, imageUrl: req.file ? process.env.HOST + "/" + req.file.path : null});
   if (response.status === "ok") {
     return res.status(201).send(response);
   } else {
@@ -18,8 +18,9 @@ async function getById(req, res) {
 }
 
 async function getByIds(req, res) {
-  const response = await petQueries.findByQuery({ _id: {$in: JSON.parse(req.query.listOfPetsIds)}
-});
+  const response = await petQueries.findByQuery({
+    _id: { $in: JSON.parse(req.query.listOfPetsIds) },
+  });
   if (response.status === "ok") {
     return res.status(200).send(response);
   } else {
@@ -27,7 +28,7 @@ async function getByIds(req, res) {
     return;
   }
 }
-  
+
 async function update(req, res) {
   const response = await petQueries.updatePet(req);
   if (response.status === "ok") {
@@ -37,7 +38,7 @@ async function update(req, res) {
     return;
   }
 }
-  
+
 async function getByQuery(req, res) {
   const query = Object.keys(req.query).length !== 0 ? req.query : {};
 
