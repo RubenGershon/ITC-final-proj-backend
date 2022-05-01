@@ -1,7 +1,10 @@
 import petQueries from "../queries/petQueries.js";
 
 async function add(req, res) {
-  const response = await petQueries.createPet({ ...req.body, imageUrl: req.file ? process.env.HOST + "/" + req.file.path : null});
+  const response = await petQueries.createPet({
+    ...req.body,
+    imageUrl: req.file.path,
+  });
   if (response.status === "ok") {
     return res.status(201).send(response);
   } else {
@@ -38,7 +41,7 @@ async function update(req, res) {
     return;
   }
 }
-
+  
 async function getByQuery(req, res) {
   const query = Object.keys(req.query).length !== 0 ? req.query : {};
 
