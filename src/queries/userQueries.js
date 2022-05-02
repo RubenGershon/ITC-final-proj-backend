@@ -13,6 +13,19 @@ async function findUser(email) {
   }
 }
 
+async function findUserById(id) {
+  try {
+    const user = await userModel.findById(id);
+    if (user) {
+      return { status: "ok", data: user };
+    } else {
+      return { status: "error", message: "user not found" };
+    }
+  } catch (error) {
+    return { status: "error", message: error };
+  }
+}
+
 async function findAllUsers() {
   try {
     const users = await userModel.find({});
@@ -22,4 +35,4 @@ async function findAllUsers() {
   }
 }
 
-export default { findUser, findAllUsers };
+export default { findUser, findUserById, findAllUsers };

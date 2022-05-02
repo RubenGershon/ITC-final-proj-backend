@@ -8,6 +8,12 @@ async function getUser(req, res) {
   });
 }
 
+async function getUserById(req, res) {
+  const response = await userQueries.findUserById(req.params.id)
+  if (response.status === "ok") return res.status(200).send(response)
+  else return res.status(400).send(response);
+}
+
 async function getAllUsers(req, res) {
   const response = await userQueries.findAllUsers();
   if (response.status !== "ok") {
@@ -45,4 +51,4 @@ async function update(req, res) {
   }
 }
 
-export default { update, getUser, getAllUsers };
+export default { update, getUser, getAllUsers, getUserById };

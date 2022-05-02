@@ -9,6 +9,7 @@ router.use(tokenValidation);
 
 // get all users, protected to admin
 router.get("/all", adminValidation, userController.getAllUsers);
+router.get("/:id", adminValidation, userController.getUserById);
 
 //get a user based on the user's id.
 //Return all the user details (aside from password) and the users pets they own
