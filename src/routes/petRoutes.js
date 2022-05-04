@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { v4 as uuidv4 } from "uuid";
-import { CloudinaryStorage } from "multer-storage-cloudinary"
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import petController from "../controllers/petController.js";
 import tokenValidation from "../middlewares/tokenValidation.js";
 import adminValidation from "../middlewares/adminValidation.js";
@@ -14,19 +14,26 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: "PetAdoptionImages",
-      allowedFormats: ["jpeg", "png", "jpg"],
+      allowed_formats: ["jpeg", "png", "jpg"],
       public_id: uuidv4(),
+      access_type: "token",
     };
   },
 });
-const parser = multer({ storage: storage});
+const parser = multer({ storage: storage });
 
 const router = express.Router();
 router.use(tokenValidation);
 
 // Admin protected
 router.post("/", adminValidation, parser.single("image"), petController.add);
-router.put("/:id", adminValidation, petIdValidation, petController.update);
+router.post(
+  "/:id",
+  adminValidation,
+  petIdValidation,
+  parser.single("image"),
+  petController.update
+);
 
 // Get pet(s) by query
 router.get("/", petController.getByQuery);

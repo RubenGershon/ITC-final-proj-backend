@@ -13,6 +13,15 @@ async function add(req, res) {
   }
 }
 
+async function update(req, res) {
+  const response = await petQueries.updatePet(req);
+  if (response.status === "ok") {
+    return res.status(201).send(response);
+  } else {
+    res.status(400).send(response);
+    return;
+  }
+}
 async function getById(req, res) {
   res.status(200).send({
     status: "ok",
@@ -32,15 +41,6 @@ async function getByIds(req, res) {
   }
 }
 
-async function update(req, res) {
-  const response = await petQueries.updatePet(req);
-  if (response.status === "ok") {
-    return res.status(201).send(response);
-  } else {
-    res.status(400).send(response);
-    return;
-  }
-}
   
 async function getByQuery(req, res) {
   const query = Object.keys(req.query).length !== 0 ? req.query : {};
