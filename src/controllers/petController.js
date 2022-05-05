@@ -41,19 +41,19 @@ async function getByIds(req, res) {
   }
 }
 
-  
 async function getByQuery(req, res) {
-  const query = Object.keys(req.query).length !== 0 ? req.query : {};
+  let query = JSON.parse(req.query.queryStr);
+  query = Object.keys(query).length !== 0 ? query : {};
 
   const response = await petQueries.findByQuery(query);
   if (response.status === "ok") {
     return res.status(200).send(response);
   } else {
     res.status(400).send(response);
+  }
     return;
   }
-}
-
+    
 async function adopt(req, res) {
   try {
     req.user.caredPetsIds.push(req.pet._id);
@@ -69,7 +69,7 @@ async function adopt(req, res) {
     message: "pet successfully " + req.body.adoptionStatus,
   });
 }
-
+  
 async function returnPet(req, res) {
   req.user.caredPetsIds = req.user.caredPetsIds.filter(
     (id) => id !== req.params.id
