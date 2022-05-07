@@ -21,14 +21,20 @@ const storage = new CloudinaryStorage({
   },
 });
 const parser = multer({ storage: storage });
-
 const router = express.Router();
-router.use(tokenValidation);
+
 
 // Admin protected
-router.post("/", adminValidation, parser.single("image"), petController.add);
+router.post(
+  "/",
+  tokenValidation,
+  adminValidation,
+  parser.single("image"),
+  petController.add
+);
 router.post(
   "/:id",
+  tokenValidation,
   adminValidation,
   petIdValidation,
   parser.single("image"),
@@ -43,14 +49,32 @@ router.get("/byIDs", petController.getByIds);
 
 // Get specific pet by ID
 router.get("/:id", petIdValidation, petController.getById);
-router.post("/:id/adopt", userValidation, petIdValidation, petController.adopt);
+router.post(
+  "/:id/adopt",
+  tokenValidation,
+  userValidation,
+  petIdValidation,
+  petController.adopt
+);
 router.post(
   "/:id/return",
+  tokenValidation,
   userValidation,
   petIdValidation,
   petController.returnPet
 );
-router.post("/:id/save", userValidation, petIdValidation, petController.save);
-router.delete("/:id/save", userValidation, petController.unsave);
+router.post(
+  "/:id/save",
+  tokenValidation,
+  userValidation,
+  petIdValidation,
+  petController.save
+);
+router.delete(
+  "/:id/save",
+  tokenValidation,
+  userValidation,
+  petController.unsave
+);
 
 export default router;

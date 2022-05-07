@@ -30,8 +30,15 @@ async function getById(req, res) {
 }
 
 async function getByIds(req, res) {
+  let parsed = "";
+  try {
+    parsed = JSON.parse(req.query.listOfPetsIds);
+  } catch (error) {
+    res.status(400).send({ status: "error", message: "getByIds server error" });
+    return;
+  }
   const response = await petQueries.findByQuery({
-    _id: { $in: JSON.parse(req.query.listOfPetsIds) },
+    _id: { $in: parsed },
   });
   if (response.status === "ok") {
     return res.status(200).send(response);
@@ -51,9 +58,9 @@ async function getByQuery(req, res) {
   } else {
     res.status(400).send(response);
   }
-    return;
-  }
-    
+  return;
+}
+
 async function adopt(req, res) {
   try {
     req.user.caredPetsIds.push(req.pet._id);
@@ -69,7 +76,7 @@ async function adopt(req, res) {
     message: "pet successfully " + req.body.adoptionStatus,
   });
 }
-  
+
 async function returnPet(req, res) {
   req.user.caredPetsIds = req.user.caredPetsIds.filter(
     (id) => id !== req.params.id

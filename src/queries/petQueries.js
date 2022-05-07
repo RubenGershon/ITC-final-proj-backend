@@ -57,5 +57,5 @@ async function updatePet(req) {
     return { status: "error", message: error };
   }
 }
-
+  
 export default { createPet, findPetById, updatePet, findByQuery };
