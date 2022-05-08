@@ -13,6 +13,16 @@ async function add(req, res) {
   }
 }
 
+async function deletePet(req, res) {
+  const response = await petQueries.deletePet(req.params.id);
+  if (response.status === "ok") {
+    return res.status(201).send(response);
+  } else {
+    res.status(400).send(response);
+    return;
+  }
+}
+
 async function update(req, res) {
   const response = await petQueries.updatePet(req);
   if (response.status === "ok") {
@@ -22,6 +32,7 @@ async function update(req, res) {
     return;
   }
 }
+
 async function getById(req, res) {
   res.status(200).send({
     status: "ok",
@@ -117,6 +128,7 @@ async function unsave(req, res) {
 
 export default {
   add,
+  deletePet,
   getById,
   getByIds,
   update,

@@ -25,6 +25,7 @@ const router = express.Router();
 
 
 // Admin protected
+// Post a new pet
 router.post(
   "/",
   tokenValidation,
@@ -32,6 +33,8 @@ router.post(
   parser.single("image"),
   petController.add
 );
+
+// Update existing pet
 router.post(
   "/:id",
   tokenValidation,
@@ -41,6 +44,15 @@ router.post(
   petController.update
 );
 
+// delete existing gpet
+router.delete(
+  "/:id",
+  tokenValidation,
+  adminValidation,
+  petIdValidation,
+  petController.deletePet
+  );
+  
 // Get pet(s) by query
 router.get("/", petController.getByQuery);
 
@@ -76,5 +88,7 @@ router.delete(
   userValidation,
   petController.unsave
 );
+
+
 
 export default router;

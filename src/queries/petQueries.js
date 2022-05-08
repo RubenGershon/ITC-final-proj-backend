@@ -9,6 +9,15 @@ async function createPet(data) {
   }
 }
 
+async function deletePet(id) {
+  try {
+    await petModel.deleteOne({ _id: id });
+    return { status: "ok", message: "Pet succesfully deleted" };
+  } catch (error) {
+    return { status: "error", message: error };
+  }
+}
+
 async function findPetById(id) {
   try {
     const pet = await petModel.findById(id);
@@ -58,4 +67,4 @@ async function updatePet(req) {
   }
 }
   
-export default { createPet, findPetById, updatePet, findByQuery };
+export default { createPet, deletePet, findPetById, updatePet, findByQuery };
