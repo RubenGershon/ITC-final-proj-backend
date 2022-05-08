@@ -71,7 +71,7 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-  res.clearCookie();
+  res.clearCookie("token");
   res.status(200).send({
     status: "ok",
   });

@@ -9,13 +9,18 @@ router.use(tokenValidation);
 
 // get all users, protected to admin
 router.get("/all", adminValidation, userController.getAllUsers);
+
+//Get any user, based on users Ids
 router.get("/:id", adminValidation, userController.getUserById);
 
-//get a user based on the user's id.
+//get the currently loggIn user.
 //Return all the user details (aside from password) and the users pets they own
 router.get("/", userValidation, userController.getUser);
 
 // Modify a user
 router.put("/", userValidation, userController.update);
+
+// Delete a user, admin protected
+router.delete("/:id", adminValidation, userController.deleteUser);
 
 export default router;

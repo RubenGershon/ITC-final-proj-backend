@@ -35,4 +35,14 @@ async function findAllUsers() {
   }
 }
 
-export default { findUser, findUserById, findAllUsers };
+
+async function deleteUser(id) {
+  try {
+    await userModel.deleteOne({ _id: id });
+    return { status: "ok", message: "User successfully deleted" };
+  } catch (error) {
+    return { status: "error", message: error };
+  }
+}
+
+export default { findUser, findUserById, findAllUsers, deleteUser };
