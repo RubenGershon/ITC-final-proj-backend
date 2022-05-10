@@ -1,11 +1,20 @@
 import petQueries from "../queries/petQueries.js";
 import userQueries from "../queries/userQueries.js";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 async function add(req, res) {
+  const uploadImg = await cloudinary.uploader.upload(req.file.path, {
+    folder: "PetAdoption",
+  });
+  uploadImg && fs.promises.unlink(req.file.path);
+
   const response = await petQueries.createPet({
     ...req.body,
-    imageUrl: req.file.path,
+    imageUrl: uploadImg.secure_url,
+    publicImageId: uploadImg.public_id,
   });
+
   if (response.status === "ok") {
     return res.status(201).send(response);
   } else {
@@ -22,8 +31,10 @@ async function deletePet(req, res) {
     const savedPetsIds = user.savedPetsIds.toObject();
     user.caredPetsIds = caredPetsIds.filter((id) => id !== req.params.id);
     user.savedPetsIds = savedPetsIds.filter((id) => id !== req.params.id);
-    await user.save()
+    await user.save();
   });
+
+  await cloudinary.uploader.destroy(req.pet.publicImageId);
   const response = await petQueries.deletePet(req.params.id);
   if (response.status === "ok") {
     return res.status(201).send(response);
@@ -32,13 +43,53 @@ async function deletePet(req, res) {
     return;
   }
 }
-  
+
 async function update(req, res) {
-  const response = await petQueries.updatePet(req);
-  if (response.status === "ok") {
-    return res.status(201).send(response);
-  } else {
-    res.status(400).send(response);
+  const pet = req.pet;
+  try {
+    if ("name" in req.body) {
+      if (pet.name !== req.body.name) {
+        pet.name = req.body.name;
+      }
+    }
+    if ("type" in req.body) pet.type = req.body.type;
+    if ("adoptionStatus" in req.body)
+      pet.adoptionStatus = req.body.adoptionStatus;
+    if ("color" in req.body) pet.color = req.body.color;
+    if ("breed" in req.body) pet.breed = req.body.breed;
+    if ("weight" in req.body) pet.weight = req.body.weight;
+    if ("height" in req.body) pet.height = req.body.height;
+    if ("hypoallergenic" in req.body)
+      pet.hypoallergenic = req.body.hypoallergenic;
+    if ("bio" in req.body) pet.bio = req.body.bio;
+    if ("dietaryRestrictions" in req.body)
+      pet.dietaryRestrictions = req.body.dietaryRestrictions;
+
+    if (req.file) {
+      try {
+        await cloudinary.uploader.destroy(pet.publicImageId);
+      } catch (err) { }
+      
+      const uploadImg = await cloudinary.uploader.upload(req.file.path, {
+        folder: "PetAdoption",
+      });
+
+      uploadImg && fs.promises.unlink(req.file.path);
+      pet.imageUrl = uploadImg.secure_url;
+      pet.publicImageId = uploadImg.public_id;
+    }
+
+    await pet.save();
+    res.status(201).send({
+      status: "ok",
+      message: "pet successfully updated",
+    });
+    return;
+  } catch (error) {
+    res.status(400).send({
+      status: "error",
+      message: error,
+    });
     return;
   }
 }

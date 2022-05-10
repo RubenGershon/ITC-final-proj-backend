@@ -1,28 +1,14 @@
 import express from "express";
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
-import { v4 as uuidv4 } from "uuid";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import petController from "../controllers/petController.js";
 import tokenValidation from "../middlewares/tokenValidation.js";
 import adminValidation from "../middlewares/adminValidation.js";
 import petIdValidation from "../middlewares/petIdValidation.js";
 import userValidation from "../middlewares/userValidation.js";
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    return {
-      folder: "PetAdoptionImages",
-      allowed_formats: ["jpeg", "png", "jpg"],
-      public_id: uuidv4(),
-      access_type: "token",
-    };
-  },
-});
-const parser = multer({ storage: storage });
-const router = express.Router();
 
+const router = express.Router();
+const upload = multer({ dest: process.env.UPLOAD_FOLDER + "/" });
 
 // Admin protected
 // Post a new pet
@@ -30,7 +16,7 @@ router.post(
   "/",
   tokenValidation,
   adminValidation,
-  parser.single("image"),
+  upload.single("image"),
   petController.add
 );
 
@@ -40,7 +26,7 @@ router.post(
   tokenValidation,
   adminValidation,
   petIdValidation,
-  parser.single("image"),
+  upload.single("image"),
   petController.update
 );
 
@@ -51,8 +37,8 @@ router.delete(
   adminValidation,
   petIdValidation,
   petController.deletePet
-  );
-  
+);
+
 // Get pet(s) by query
 router.get("/", petController.getByQuery);
 
@@ -88,7 +74,5 @@ router.delete(
   userValidation,
   petController.unsave
 );
-
-
 
 export default router;

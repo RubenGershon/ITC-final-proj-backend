@@ -34,6 +34,11 @@ const PetSchema = new mongoose.Schema(
       required: true,
       maxlength: 1000,
     },
+    publicImageId: {
+      type: String,
+      required: true,
+      maxlength: 1000,
+    },
     height: {
       type: Number,
       required: true,
