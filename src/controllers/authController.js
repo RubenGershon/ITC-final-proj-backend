@@ -1,7 +1,6 @@
 import authQueries from "../queries/authQueries.js";
 import tokenUtils from "../authentication/token.js";
 import bcrypt from "bcrypt";
-import deleteWrapper from "../utils.js";
 
 async function signUp(req, res) {
   const response = await authQueries.createUser(req.body);
@@ -10,21 +9,13 @@ async function signUp(req, res) {
     return;
   }
 
-  const user = response.data;
-  const plainFilteredUser = deleteWrapper(user.toObject(), [
-    "password",
-    "phoneNumber",
-    "__v",
-  ]);
-
-  res.cookie("token", tokenUtils.createToken(plainFilteredUser), {
+  res.cookie("token", tokenUtils.createToken(response.data), {
     httpOnly: true,
     sameSite: "lax",
   });
 
   res.status(201).send({
     status: "ok",
-    data: plainFilteredUser,
   });
   return;
 }
@@ -41,28 +32,27 @@ async function login(req, res) {
     return;
   }
 
-  const response = await authQueries.findUser(body.email);
+  const response = await authQueries.findUser(body.email, {
+    password: 1,
+  });
   if (response.status !== "ok") {
     res.status(404).send(response);
     return;
   }
 
-  const user = response.data;
-  if (await bcrypt.compare(body.password, user.password)) {
-    const plainFilteredUser = deleteWrapper(user.toObject(), [
-      "password",
-      "phoneNumber",
-      "__v",
-    ]);
-
-    res.cookie("token", tokenUtils.createToken(plainFilteredUser), {
-      httpOnly: true,
-      sameSite: "lax",
-    });
+  if (await bcrypt.compare(body.password, response.data.password)) {
+    const response = await authQueries.findUser(body.email);
+    res.cookie(
+      "token",
+      tokenUtils.createToken(response.data),
+      {
+        httpOnly: true,
+        sameSite: "lax",
+      }
+    );
 
     res.status(200).send({
       status: "ok",
-      data: plainFilteredUser,
     });
   } else {
     res.status(400).json({ status: "error", message: "invalid password" });

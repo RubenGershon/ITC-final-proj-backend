@@ -1,10 +1,15 @@
 import userModel from "../models/userModel.js";
 
+
 async function createUser(data) {
   try {
-    const user = await userModel.create(data);
+    const user = await userModel.create(data, {
+      _id: 1,
+      email: 1,
+      role:1
+    });
     if (user) {
-      return { status: "ok", data: user };
+      return { status: "ok", data: user.toObject() };
     } else {
       return { status: "error", message: "unknown" };
     }
@@ -13,11 +18,18 @@ async function createUser(data) {
   }
 }
 
-async function findUser(email) {
+async function findUser(
+  email,
+  userDataToReturn = {
+    _id: 1,
+    email: 1,
+    role:1
+  }
+) {
   try {
-    const user = await userModel.findOne({ email: email });
+    const user = await userModel.findOne({ email: email }, userDataToReturn);
     if (user) {
-      return { status: "ok", data: user };
+      return { status: "ok", data: user.toObject() };
     } else {
       return { status: "error", message: "user not found" };
     }

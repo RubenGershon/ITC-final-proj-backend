@@ -1,4 +1,5 @@
 import petQueries from "../queries/petQueries.js";
+import userQueries from "../queries/userQueries.js";
 
 async function add(req, res) {
   const response = await petQueries.createPet({
@@ -13,7 +14,16 @@ async function add(req, res) {
   }
 }
 
+// Go over each user to remove the pet to delete from their lists
 async function deletePet(req, res) {
+  const usersResponse = await userQueries.findAllUsers();
+  usersResponse.data.forEach(async (user) => {
+    const caredPetsIds = user.caredPetsIds.toObject();
+    const savedPetsIds = user.savedPetsIds.toObject();
+    user.caredPetsIds = caredPetsIds.filter((id) => id !== req.params.id);
+    user.savedPetsIds = savedPetsIds.filter((id) => id !== req.params.id);
+    await user.save()
+  });
   const response = await petQueries.deletePet(req.params.id);
   if (response.status === "ok") {
     return res.status(201).send(response);
@@ -22,7 +32,7 @@ async function deletePet(req, res) {
     return;
   }
 }
-
+  
 async function update(req, res) {
   const response = await petQueries.updatePet(req);
   if (response.status === "ok") {

@@ -1,11 +1,10 @@
 import userQueries from "../queries/userQueries.js";
 import petQueries from "../queries/petQueries.js";
-import deleteWrapper from "../utils.js";
 
 async function getUser(req, res) {
   res.status(200).send({
     status: "ok",
-    data: deleteWrapper(req.user.toObject(), ["password", "__v"]),
+    data: req.user.toObject(),
   });
 }
 
@@ -22,11 +21,6 @@ async function getAllUsers(req, res) {
     return;
   }
 
-  const filteredUsers = [];
-  response.data.forEach((user) => {
-    filteredUsers.push(deleteWrapper(user.toObject(), ["password", "__v"]));
-  });
-  response.data = filteredUsers;
   res.status(201).send(response);
 }
 
