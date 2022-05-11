@@ -121,8 +121,8 @@ async function getByIds(req, res) {
 }
 
 async function getByQuery(req, res) {
-  let query = JSON.parse(req.query.queryStr);
-  query = Object.keys(query).length !== 0 ? query : {};
+  let query = req.query && req.query.queryStr && JSON.parse(req.query.queryStr);
+  query = query ? query : {}
 
   const response = await petQueries.findByQuery(query);
   if (response.status === "ok") {

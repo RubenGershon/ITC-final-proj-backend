@@ -3,11 +3,7 @@ import userModel from "../models/userModel.js";
 
 async function createUser(data) {
   try {
-    const user = await userModel.create(data, {
-      _id: 1,
-      email: 1,
-      role:1
-    });
+    const user = await userModel.create(data);
     if (user) {
       return { status: "ok", data: user.toObject() };
     } else {

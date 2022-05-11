@@ -9,7 +9,8 @@ async function signUp(req, res) {
     return;
   }
 
-  res.cookie("token", tokenUtils.createToken(response.data), {
+  const newobj = { _id: response.data._id, email: response.data.email };
+  res.cookie("token", tokenUtils.createToken(newobj), {
     httpOnly: true,
     sameSite: "lax",
   });
@@ -42,14 +43,10 @@ async function login(req, res) {
 
   if (await bcrypt.compare(body.password, response.data.password)) {
     const response = await authQueries.findUser(body.email);
-    res.cookie(
-      "token",
-      tokenUtils.createToken(response.data),
-      {
-        httpOnly: true,
-        sameSite: "lax",
-      }
-    );
+    res.cookie("token", tokenUtils.createToken(response.data), {
+      httpOnly: true,
+      sameSite: "lax",
+    });
 
     res.status(200).send({
       status: "ok",
