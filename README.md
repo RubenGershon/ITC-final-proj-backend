@@ -8,9 +8,9 @@ In the project directory, you can run:
 
 In order to work, the project need a .env file with the following structure:
 
-# JWT_SECRET = ""
-# PORT = 
-# HOST=""
-# MONGOOSE_CREDS =""
-# UPLOAD_FOLDER=""
-# CLOUDINARY_URL=
+JWT_SECRET = "" <br/>
+PORT = <br /> 
+HOST="" <br />
+MONGOOSE_CREDS ="" <br />
+UPLOAD_FOLDER="" <br />
+CLOUDINARY_URL=
