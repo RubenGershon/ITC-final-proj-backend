@@ -12,7 +12,8 @@ async function signUp(req, res) {
   const newobj = { _id: response.data._id, email: response.data.email };
   res.cookie("token", tokenUtils.createToken(newobj), {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production" ? true : false,
   });
 
   res.status(201).send({
@@ -45,7 +46,8 @@ async function login(req, res) {
     const response = await authQueries.findUser(body.email);
     res.cookie("token", tokenUtils.createToken(response.data), {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
 
     res.status(200).send({
